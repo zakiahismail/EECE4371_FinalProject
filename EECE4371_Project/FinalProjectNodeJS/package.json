@@ -1,15 +1,16 @@
 {
   "name": "hellophone",
   "version": "1.0.0",
-  "description": "EECE 4371 Hello Phone Server",
+  "description": "EECE4371 Final Project",
   "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ilham Hasnul",
-  "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.14.1",
-    "express": "^4.13.3",
-  }
+  "license": "ISC"
 }

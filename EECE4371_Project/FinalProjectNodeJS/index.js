@@ -4,7 +4,6 @@
 
 var express=require('express'),
     bodyParser=require('body-parser');
-   // $=require('jquery')(require("jsdom").jsdom().parentWindow);
 
 var app=express();
 app.use(express.static('public'));
@@ -14,7 +13,7 @@ var server = app.listen(8080, function () {
     console.log('Example app listening on ' + server.address().port);
 });
 
-app.get('/m/test', function(req,res){
+app.post('/m/test', function(req,res){
     console.log(req.url);
     var latParam=getUrlParameter("lat",req.url);
     var longParam=getUrlParameter("long",req.url);
@@ -25,13 +24,13 @@ app.get('/m/test', function(req,res){
     res.status(200).send(response);
 })
 
-app.get('/test', function(req,res){
+app.get('/map', function(req,res){
     console.log(req.url);
-    var latParam=getUrlParameter("lat",req.url);
-    var longParam=getUrlParameter("long",req.url);
-    var maxParam=getUrlParameter("maxdist",req.url);
+    var latParam=getUrlParameter("latform",req.url);
+    var longParam=getUrlParameter("longform",req.url);
+    var maxDistance=getUrlParameter("maxdistform",req.url);
 
-    var response = "Parameters recieved are lat = "+ latParam +" long = " + longParam + " max = " + maxParam;
+    var response = "Parameters received are lat = "+ latParam +", long = " + longParam + ", max distance = " + maxDistance;
     console.log(response);
     res.status(200).send(response);
 })
@@ -52,20 +51,3 @@ var getUrlParameter = function getUrlParameter(sParam,url) {
         }
     }
 };
-
-/*
-$("#testSubmit").submit(function(){
-    $.ajax({
-        url:"/test",
-        data:$("form").serialize(),
-        type: "GET",
-        dataType:"json",
-        success: function(result){
-            $("#result").append(result);
-        },
-        error:function(error){
-            $('#result').append("error");
-        }
-    })
-});
-*/
