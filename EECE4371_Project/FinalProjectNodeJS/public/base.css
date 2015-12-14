@@ -1,12 +1,16 @@
+/* CSS file for map.html styling*/
+
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
 }
+
 #map {
     height: 85%;
     width: 80%
 }
+
 .controls {
     margin-top: 10px;
     border: 1px solid transparent;
@@ -53,15 +57,23 @@ html, body {
     width: 345px;
 }
 
-#mapform{
+#mapform {
     position: fixed;
     right: 0%;
     top: 15%;
     width: 19%;
 }
 
-#result{
+#result {
     position: fixed;
     right: 0%;
     bottom: 0%;
+}
+
+#mapsubmit {
+    position: fixed;
+    right: 0%;
+    bottom: 50%;
+    height: 10%;
+    width: 19%;
 }

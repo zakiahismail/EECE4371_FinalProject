@@ -4,8 +4,11 @@
   "description": "EECE4371 Final Project",
   "main": "index.js",
   "dependencies": {
+    "airport-codes": "^1.0.2",
     "body-parser": "^1.14.1",
-    "express": "^4.13.3"
+    "express": "^4.13.3",
+    "googlemaps": "^1.0.2",
+    "mongoose": "^4.2.10"
   },
   "devDependencies": {},
   "scripts": {

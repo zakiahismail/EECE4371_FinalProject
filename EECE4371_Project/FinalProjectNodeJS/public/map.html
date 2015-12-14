@@ -5,37 +5,45 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="base.css">
     <title>Airport Searcher</title>
-    <script src=“https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js”></script>
 </head>
 <body>
+
+<!-- Google Search Box Element -->
 <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+
+<!-- Header Element -->
 <h1>Airport Finder</h1>
+
+<!-- div Element to Place Google Map -->
 <div id="map"></div>
 
-<form action="/map" method="get" id = "mapform" target="_top">
+<!-- Form to Submit Query Info -->
+<form id="mapform">
 
     <div>
         <label for="latform">LAT:</label>
-        <input type="text", id="latform", name="latform">
+        <input type="text" , id="latform" , name="latform">
     </div>
 
     <div>
         <label for="longform">LONG:</label>
-        <input type="text", id="longform", name="longform">
+        <input type="text" , id="longform" , name="longform">
     </div>
 
     <div>
         <label for="maxdistform">MAX:</label>
-        <input type="number", id ="maxdistform", name="maxdistform">
+        <input type="number" , id="maxdistform" , name="maxdistform">
     </div>
-
-    <button type="submit", id="mapsubmit">Submit</button>
 
 </form>
 
-<div id="result"></div>
+<!--Button to Submit Form Info -->
+<button onClick="getAirport()" , id="mapsubmit">Submit</button>
+
+<!-- JS Client Side Script -->
 <script>
 
+    // Initiate Google Map
     function initAutocomplete() {
         var map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: 36.1676, lng: -86.7727},
@@ -49,63 +57,74 @@
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
         // Bias the SearchBox results towards current map's viewport.
-        map.addListener('bounds_changed', function() {
+        map.addListener('bounds_changed', function () {
             searchBox.setBounds(map.getBounds());
         });
 
-        var markers = [];
-        // Listen for the event fired when the user selects a prediction and retrieve
-        // more details for that place.
-        searchBox.addListener('places_changed', function() {
-            var places = searchBox.getPlaces();
-
-            if (places.length == 0) {
-                return;
-            }
-
-            // Clear out the old markers.
-            markers.forEach(function(marker) {
-                marker.setMap(null);
-            });
-            markers = [];
-
-            // For each place, get the icon, name and location.
-            var bounds = new google.maps.LatLngBounds();
-            places.forEach(function(place) {
-                if (place.geometry.viewport) {
-                    // Only geocodes have viewport.
-                    bounds.union(place.geometry.viewport);
-                } else {
-                    bounds.extend(place.geometry.location);
-                }
-            });
-            map.fitBounds(bounds);
-        });
-
-
-        google.maps.event.addListener(map, 'click', function( event ){
-            var lat=Number(event.latLng.lat());
-            var long=Number(event.latLng.lng());
-            document.getElementById('latform').value=lat;
-            document.getElementById('longform').value=long;
+        // If a user clicks a place on the Google Map, populate the Lat and Long fields of the form
+        google.maps.event.addListener(map, 'click', function (event) {
+            var lat = Number(event.latLng.lat());
+            var long = Number(event.latLng.lng());
+            document.getElementById('latform').value = lat;
+            document.getElementById('longform').value = long;
         });
     }
 
-    $("#mapsubmit").submit(function(event){
-        $.ajax({
-            url:"/map",
-            data:$("#mapform").serialize(),
-            type: "GET",
-            dataType:"text",
-            success: function(result){
-                alert(result);
-            },
-            error:function(error){
-                $('#result').append("error");
-            }
-        })
-    })
+    // Function to query for airport. Set to run when 'Submit' button is pressed
+    function getAirport() {
+        console.log('getAirport');
+        // Create XMLHttpRequest object to send form data to server and react to server's response
+        var xhttp = new XMLHttpRequest();
+        if (!xhttp) {
+            console.log("Can't create XMLHttpRequest object")
+        }
+        var mLat = document.getElementById("latform").value;
+        var mLong = document.getElementById("longform").value;
+        var maxDist = document.getElementById("maxdistform").value;
+        var url = '/map?lat=' + mLat + "&long=" + mLong + "&maxdist=" + maxDist;
+        console.log('url:' + url);
 
+        // Set callback function when results have arrived from the server
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                var response = xhttp.responseText.split(',');
+                var mLatLng = {lat: response[0], lng: response[1]};
+                var mMap = document.getElementById('map');
+
+                // Place a Google Map Marker on the nearest airport
+                var marker = new google.maps.Marker({
+                    position: mLatLng,
+                    map: mMap,
+                    title: 'Nearest Airport'
+                });
+
+                // Get Google Map directions from latLng submitted from map to the nearest airport
+                var directionService = new google.maps.DirectionService;
+                var directionDisplay = new google.maps.DirectionsRenderer;
+                directionDisplay.setMap(mMap);
+                var originLatLng = {lat: mLat, lng: mLng};
+                directionService.route({
+                    origin: originLatLng,
+                    destination: mLatLng,
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, function (response, status) {
+                    if (status === google.maps.DirectionStatus.OK) {
+                        directionDisplay.setDirections(response);
+                    } else {
+                        console.log("Error in getting directions due to: " + status);
+                    }
+                })
+            }
+
+            else if (xhttp.readyState == 4 && xhttp.status == 417) {
+                window.alert('No nearby airport found');
+            }
+        }
+
+        // Send the XMLHttpRequest
+        xhttp.open("GET", url, true);
+        xhttp.send()
+    }
 
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRZSLk0_fy-qrhIOIMdPJNAjktSwasvAw&libraries=places&callback=initAutocomplete"
